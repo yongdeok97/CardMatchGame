@@ -88,13 +88,13 @@ h1 {
     transform: rotateY(0deg);
 }
 
-.card-item:hover .front {
+/* .card-item:hover .front {
     transform: rotateY(180deg);
 }
 
 .card-item:hover .back {
     transform: rotateY(0deg);
-}
+} */
 
 .record {
     position: absolute;
@@ -115,4 +115,15 @@ h1 {
 
 .timer {
     font-size: 50px;
+}
+@media (max-width: 1592px) {
+    .record {
+        box-shadow: 0 0 10px red;
+        position: inherit;
+        top: 10%;
+        right: 15%;
+    }    
+    .container {
+        margin: 0 auto;
+    }
 }
