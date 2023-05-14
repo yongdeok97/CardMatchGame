@@ -1,6 +1,6 @@
 const container = document.querySelector(".container");
 const btnStart = document.querySelector(".btn-start");
-const timeSet = document.querySelector(".timer");
+
 
 let images = [
   "alpaca.png",
@@ -15,25 +15,38 @@ let images = [
   "whale.png",
 ];
 
-let time = 0;
-let Utimer = null;
-let timetoggle = false;
 
-// 이거 좁근 할 수 없게 만들어 볼까 클로저로?
-function updateTime() {
-  time++;
-  let minutes = Math.floor(time / 60);
-  let seconds = Math.floor(time % 60);
-  let hours = Math.floor(time / 3600);
+class Time {
+  constructor() {
+    this.startTime = null;
+    this.timeSet = document.querySelector(".timer");
+    this.timerId = null;
+  }
 
-  minutes = minutes < 10 ? "0" + minutes : minutes;
-  seconds = seconds < 10 ? "0" + seconds : seconds;
-  hours = hours < 10 ? "0" + hours : hours;
+  start() {
+    this.startTime = Date.now(); // 시작 시간
+    this.timerId = setInterval(() => {
+      let elapsedTime = Date.now() - this.startTime; // 경과 시간
 
-  hourEl.textContent = hours;
-  minEl.textContent = minutes;
-  secEl.textContent = seconds;
+      let seconds = Math.floor(elapsedTime / 1000 % 60);
+      let minutes = Math.floor(elapsedTime / 1000 / 60 % 60);
+      let hours = Math.floor(elapsedTime / 1000 / 60 / 60 % 60);
+
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+      hours = hours < 10 ? "0" + hours : hours;
+
+      this.timeSet.innerText = `${hours}:${minutes}:${seconds}`;
+    }, 1000); // 1초마다 업데이트
+  }
+
+  stop() {
+    clearInterval(this.timerId);
+    this.timeSet.innerText = "";
+  }
 }
+
+
 
 function shuffle(array) {
   return [...array, ...array].sort(() => Math.random() - 0.5);
@@ -100,18 +113,11 @@ function reverse(front, back, checkPair) {
   }
 }
 
-function timer() {
-  time.textContent = "00";
-}
-
 function getStart(checkPair) {
   const front = document.querySelectorAll(".card-item .front");
   const back = document.querySelectorAll(".card-item .back");
-  //   뒤집기
+
   reverseAll(front, back);
-  //  시간 흐르기
-  timer();
-  //  카드 누르면 뒤집어
   reverse(front, back, checkPair);
 }
 
@@ -124,25 +130,21 @@ let CheckPair = (function () {
   }
   CheckPair.prototype.check = function (card, id) {
     count++;
-    console.log('count' + count);
     if (count === 2) {
       count = 0;
       if (cardItem === card)
       {
         cardItem = ''
-        console.log('match ok')
         return 1;
       }
       else {
         cardItem = ''
-        console.log('march not ok')
         return [-1, id];
       }
     }
     else {
       cardItem = card;
       cardId = id;
-      console.log('one card picked')
       return 0
     }
   }
@@ -161,5 +163,9 @@ let CheckPair = (function () {
 
 btnStart.addEventListener("click", () => {
   const checkPair = new CheckPair();
+  const time = new Time();
+  
   getStart(checkPair);
+  setTimeout(() => {time.start()}, 2000);
+  btnStart.textContent = 'GIVE UP'
 });
